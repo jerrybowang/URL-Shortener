@@ -1,0 +1,23 @@
+# This compose file is for local development. All secrets are loaded from .env
+
+services:
+
+  backend:
+    env_file: .env
+    build: ./backend
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend:/app
+      # loads from dockerfile level
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload --log-level debug
+
+  frontend:
+    env_file: .env
+    build: ./frontend
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./frontend/src:/app/src
+      # - /app/node_modules
+    command: npm start
