@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useAuth0 } from "@auth0/auth0-react";
 import AuthButtons from "./components/AuthButtons";
 import ShortenForm from "./components/ShortenForm";
+import CustomShortenForm from "./components/CustomShortenForm";
 import ShortUrlDisplay from "./components/ShortUrlDisplay";
 
 export default function App() {
@@ -14,10 +15,20 @@ export default function App() {
 
       <AuthButtons />
 
-      {isAuthenticated && (
+      {isAuthenticated ? (
         <>
           <p>Welcome, <b>{user.name}</b>!</p>
-          <ShortenForm getAccessToken={getAccessTokenSilently} setShortUrl={setShortUrl} />
+          <CustomShortenForm
+            getAccessToken={getAccessTokenSilently}
+            setShortUrl={setShortUrl}
+          />
+          <ShortUrlDisplay shortUrl={shortUrl} />
+        </>
+      ) : (
+        <>
+          <p>You can shorten URLs without logging in 👇</p>
+          <p>For Custom alias, please login</p>
+          <ShortenForm setShortUrl={setShortUrl} />
           <ShortUrlDisplay shortUrl={shortUrl} />
         </>
       )}

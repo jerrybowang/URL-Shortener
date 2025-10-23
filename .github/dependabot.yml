@@ -1,0 +1,30 @@
+version: 2
+updates:
+  - package-ecosystem: "pip"           
+    directory: "/backend/requirements.txt"
+    schedule:
+      interval: "weekly"
+      day: "sunday"
+    open-pull-requests-limit: 5
+    commit-message: 
+      prefix: "[OPS-001]"
+
+  - package-ecosystem: "docker"
+    directories:
+      - "/backend"
+      - "/frontend"
+    schedule:
+      interval: "weekly"
+      day: "sunday"
+    open-pull-requests-limit: 5
+    commit-message: 
+      prefix: "[OPS-001]"
+
+  - package-ecosystem: "npm"
+    directory: "/frontend"
+    schedule:
+      interval: "weekly"
+      day: "sunday"
+    open-pull-requests-limit: 5
+    commit-message: 
+      prefix: "[OPS-001]"
