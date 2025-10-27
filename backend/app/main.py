@@ -1,10 +1,19 @@
-from fastapi import FastAPI, Depends, status
+from fastapi import FastAPI, Depends, status, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from app.auth import verify_token
 from app.models import URLRequest
 from fastapi.responses import RedirectResponse
 
+# import DB libs
+from sqlalchemy import inspect
+from sqlalchemy.orm import Session
+
+# import DB and models
+from app.DB.database import engine, get_db
+from app.DB.models import URL
+
 app = FastAPI()
+
 
 # allow frontend dev server
 origins = [
@@ -27,10 +36,35 @@ def public():
 def health():
     return {"message": "I'm alive!"}
 
+@app.get("/debug/schema")
+def debug_schema():
+    inspector = inspect(engine)
+    tables = inspector.get_table_names()
+
+    schema_info = {}
+    for table in tables:
+        columns = [
+            {
+                "name": col["name"],
+                "type": str(col["type"]),
+                "nullable": col["nullable"],
+                "default": str(col["default"]),
+            }
+            for col in inspector.get_columns(table)
+        ]
+        schema_info[table] = columns
+
+    return schema_info
+
+
 @app.get("/{key}")
-def get_long_url(key: str):
-    dummy = "http://localhost:3000"
-    return RedirectResponse(dummy, status_code = status.HTTP_307_TEMPORARY_REDIRECT)
+def get_long_url(key: str, db: Session = Depends(get_db)):
+    url_entry = db.query(URL).filter(URL.short_key == key).first()
+
+    if not url_entry:
+        raise HTTPException(status_code=404, detail="Short URL not found")
+    
+    return RedirectResponse(url_entry, status_code=status.HTTP_307_TEMPORARY_REDIRECT)
 
 
 @app.post("/shorten/custom")

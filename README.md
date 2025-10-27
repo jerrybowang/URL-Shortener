@@ -10,7 +10,7 @@ The frontend is a **minimal React web app**, generated with AI, serving mainly a
 - **Authentication:** Handled via **Auth0**.  
 - **Authorization:** The frontend passes a **JWT** to the backend, which verifies it before processing requests.
 - **Frontend:** Simple React app to interact with the backend API.
-- **Backend:** Containerized API service for authentication and request handling.
+- **Backend:** Containerized API service for request handling.
 - **Secrets:**
  `.env` for local development, secrets management(eg. Github secrets) for CI/CD and cloud environment.
 
@@ -21,20 +21,29 @@ The frontend is a **minimal React web app**, generated with AI, serving mainly a
 Create a `.env` file in the project root directory with the following environment variables:
 
 ```bash
-REACT_APP_AUTH0_DOMAIN=<your_auth0_domain>
-REACT_APP_AUTH0_CLIENT_ID=<your_auth0_client_id>
-REACT_APP_AUTH0_API_AUDIENCE=<your_auth0_api_audience>
+# used by the frontend (React)
+REACT_APP_AUTH0_DOMAIN=< your auth0 domain >
+REACT_APP_AUTH0_CLIENT_ID=< your auth0 client ID >
+REACT_APP_AUTH0_API_AUDIENCE=< your auth0 api audience >
 
-AUTH0_DOMAIN=<your_auth0_domain>
-API_AUDIENCE=<your_auth0_api_audience>
+# used by the backend
+AUTH0_DOMAIN=< your auth0 domain >
+API_AUDIENCE=< your auth0 api audience >
+
+# used by the DB
+POSTGRES_USER=< user name >
+POSTGRES_PASSWORD=< secret password >
+POSTGRES_DB=< DB name >
+POSTGRES_HOST=< must matches the service name in docker-compose >
+POSTGRES_PORT=< port number >
+DATABASE_URL=postgresql+psycopg2://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}
+
+
 ```
-
-The `REACT_APP_` variables are used by the frontend (React),
-while `AUTH0_DOMAIN` and `API_AUDIENCE` are used by the backend.
 
 ### 2. Start the Services
 
-To spin up both the frontend and backend using Docker Compose.
+To spin up the service using Docker Compose.
 
 ```bash
 docker compose up

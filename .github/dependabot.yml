@@ -3,8 +3,7 @@ updates:
   - package-ecosystem: "pip"           
     directory: "/backend"
     schedule:
-      interval: "weekly"
-      day: "sunday"
+      interval: "monthly"
     open-pull-requests-limit: 5
     commit-message: 
       prefix: "[OPS-001]"
@@ -14,8 +13,7 @@ updates:
       - "/backend"
       - "/frontend"
     schedule:
-      interval: "weekly"
-      day: "sunday"
+      interval: "monthly"
     open-pull-requests-limit: 5
     commit-message: 
       prefix: "[OPS-001]"
@@ -23,8 +21,7 @@ updates:
   - package-ecosystem: "npm"
     directory: "/frontend"
     schedule:
-      interval: "weekly"
-      day: "sunday"
+      interval: "monthly"
     open-pull-requests-limit: 5
     commit-message: 
       prefix: "[OPS-001]"

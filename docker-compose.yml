@@ -3,14 +3,26 @@
 services:
 
   backend:
+    depends_on:
+      - db
     env_file: .env
     build: ./backend
     ports:
       - "8000:8000"
     volumes:
-      - ./backend:/app
-      # loads from dockerfile level
-    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload --log-level debug
+      - ./backend/app:/app/app
+      - db_ver:/app/alembic/versions
+    command: ["/bin/sh", "/app/entrypoint.sh"]
+
+  db:
+    image: postgres:18-alpine
+    restart: always
+    env_file:
+      - .env
+    volumes:
+      - db_data_url:/var/lib/postgresql
+    ports:
+      - "5432:5432"
 
   frontend:
     env_file: .env
@@ -19,5 +31,8 @@ services:
       - "3000:3000"
     volumes:
       - ./frontend/src:/app/src
-      # - /app/node_modules
     command: npm start
+
+volumes:
+  db_data_url:
+  db_ver:

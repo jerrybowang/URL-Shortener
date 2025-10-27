@@ -4,3 +4,4 @@ from typing import Optional
 class URLRequest(BaseModel):
     long_url: str
     custom_alias: Optional[str] = None
+    user_name: Optional[str] = None

@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
+import { jwtDecode } from "jwt-decode";
 import axios from "axios";
+import { useAuth0 } from "@auth0/auth0-react";
 import { commonStyles } from "../styles/commonStyles";
 
 export default function CustomShortenForm({ getAccessToken, setShortUrl }) {
@@ -7,6 +9,7 @@ export default function CustomShortenForm({ getAccessToken, setShortUrl }) {
   const [alias, setAlias] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const { user, loginWithRedirect } = useAuth0();
 
   const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:8000";
 
@@ -16,6 +19,17 @@ export default function CustomShortenForm({ getAccessToken, setShortUrl }) {
       return parsed.protocol === "http:" || parsed.protocol === "https:";
     } catch {
       return false;
+    }
+  };
+
+  const isTokenExpired = (token) => {
+    if (!token) return true;
+    try {
+      const { exp } = jwtDecode(token);
+      return !exp || Date.now() / 1000 > exp;
+    } catch (e) {
+      console.error("Failed to decode JWT:", e);
+      return true;
     }
   };
 
@@ -32,9 +46,19 @@ export default function CustomShortenForm({ getAccessToken, setShortUrl }) {
     try {
       const token = await getAccessToken();
 
+      // Check expiration before sending
+      if (isTokenExpired(token)) {
+        loginWithRedirect();
+        return;
+      }
+
       const response = await axios.post(
         `${backendUrl}/shorten/custom`,
-        { long_url: longUrl, custom_alias: alias },
+        { 
+          long_url: longUrl, 
+          custom_alias: alias,
+          user_name: user.sub
+        },
         {
           headers: { Authorization: `Bearer ${token}` },
           params: { overwrite },
