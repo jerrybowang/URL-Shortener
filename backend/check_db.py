@@ -3,7 +3,11 @@ import time
 from dotenv import load_dotenv
 from sqlalchemy import create_engine
 from sqlalchemy.exc import OperationalError
-from app.DB.database import init_db
+from app.DB.database import init_db, Base
+
+from alembic.migration import MigrationContext
+from alembic.autogenerate import compare_metadata
+
 
 # Load .env
 load_dotenv()
@@ -31,3 +35,22 @@ else:
 
 
 init_db()
+
+# check for model changes
+with engine.connect() as conn:
+    ctx = MigrationContext.configure(conn)
+    # import tables
+    from app.DB import models 
+    diff = compare_metadata(ctx, Base.metadata)
+
+    if diff:
+        print("Model changes detected, generating migration...")
+        # Run alembic revision + upgrade programmatically
+        from alembic.config import Config
+        from alembic import command
+
+        alembic_cfg = Config("alembic.ini")
+        command.revision(alembic_cfg, message="auto sync with DB models", autogenerate=True)
+        command.upgrade(alembic_cfg, "head")
+    else:
+        print("No model changes detected, skipping migration.")

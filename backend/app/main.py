@@ -1,7 +1,5 @@
-from fastapi import FastAPI, Depends, status, HTTPException
+from fastapi import FastAPI, Depends, status, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
-from app.auth import verify_token
-from app.models import URLRequest
 from fastapi.responses import RedirectResponse
 
 # import DB libs
@@ -11,6 +9,11 @@ from sqlalchemy.orm import Session
 # import DB and models
 from app.DB.database import engine, get_db
 from app.DB.models import URL
+
+# import helpers
+from app.auth import verify_token
+from app.models import URLRequest
+from app.utils import hash_64, add_entry_to_db
 
 app = FastAPI()
 
@@ -64,7 +67,7 @@ def get_long_url(key: str, db: Session = Depends(get_db)):
     if not url_entry:
         raise HTTPException(status_code=404, detail="Short URL not found")
     
-    return RedirectResponse(url_entry, status_code=status.HTTP_307_TEMPORARY_REDIRECT)
+    return RedirectResponse(url_entry.long_url, status_code=status.HTTP_307_TEMPORARY_REDIRECT)
 
 
 @app.post("/shorten/custom")
@@ -90,5 +93,19 @@ def shorten_custom(data: URLRequest, overwrite: bool, user=Depends(verify_token)
 
 
 @app.post("/shorten")
-def shorten(data: URLRequest):
-    return {"short_url": "https://not-yet-implemented"}
+def shorten(data: URLRequest, request: Request, db: Session = Depends(get_db)):
+    # check if url already exists
+    long_url_hash = hash_64(data.long_url)
+    url_entry = db.query(URL).filter(URL.long_url_hash == long_url_hash).first()
+    if url_entry:
+        short_url = str(request.url_for("get_long_url", key=url_entry.short_key))
+        return {"short_url": short_url}
+    
+    # case: need to construct the entry
+    key = add_entry_to_db(data.long_url, db)
+
+    # return the short url
+    short_url = str(request.url_for("get_long_url", key=key))
+    return {"short_url": short_url}
+
+    

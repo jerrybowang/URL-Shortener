@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import { jwtDecode } from "jwt-decode";
 import axios from "axios";
 import { useAuth0 } from "@auth0/auth0-react";
 import { commonStyles } from "../styles/commonStyles";
@@ -22,16 +21,6 @@ export default function CustomShortenForm({ getAccessToken, setShortUrl }) {
     }
   };
 
-  const isTokenExpired = (token) => {
-    if (!token) return true;
-    try {
-      const { exp } = jwtDecode(token);
-      return !exp || Date.now() / 1000 > exp;
-    } catch (e) {
-      console.error("Failed to decode JWT:", e);
-      return true;
-    }
-  };
 
     // Update error when URL changes
     useEffect(() => {
@@ -44,10 +33,12 @@ export default function CustomShortenForm({ getAccessToken, setShortUrl }) {
     setLoading(true);
     setError("");
     try {
-      const token = await getAccessToken();
-
-      // Check expiration before sending
-      if (isTokenExpired(token)) {
+      let token;
+      try {
+        token = await getAccessToken();
+      } catch (authErr) {
+        console.error("Auth0 token error", authErr);
+        setError("Session expired. Please log in again.");
         loginWithRedirect();
         return;
       }
@@ -70,30 +61,51 @@ export default function CustomShortenForm({ getAccessToken, setShortUrl }) {
       setAlias("");
     } catch (err) {
       console.error(err);
+      handleError(err);
 
-      if (err.response?.status === 409) {
-        const detail = err.response.data.detail;
-        if (typeof detail === "object" && detail.can_overwrite) {
-          const confirmOverwrite = window.confirm(
-            "You already own this alias. Do you want to overwrite the existing short link?"
-          );
-          if (confirmOverwrite) {
-            // Recursive call with overwrite flag
-            await handleShorten(true);
-            return;
-          } else {
-            setError("Alias already exists. Try another one.");
-            return;
-          }
-        }
-        setError("Alias already taken by another user.");
-      } else {
-        setError("Error shortening URL. Try again.");
-      }
     } finally {
       setLoading(false);
     }
   };
+
+  const handleError = async (error) => {
+    if (!error.response) {
+      setError("Network error. Please check your connection.");
+      return;
+    }
+
+    const { status, data, config } = error.response;
+    const requestUrl = config.url || "";
+
+    // Backend conflict (409)
+    if (status === 409 && requestUrl.includes("/shorten")) {
+      const detail = data?.detail;
+      if (detail && typeof detail === "object" && detail.can_overwrite) {
+        const confirmOverwrite = window.confirm(
+          "You already own this alias. Do you want to overwrite the existing short link?"
+        );
+        if (confirmOverwrite) {
+          await handleShorten(true);
+          return;
+        } else {
+          setError("Alias already exists. Try another one.");
+          return;
+        }
+      }
+      setError("Alias already taken by another user.");
+      return;
+    }
+
+    // Other backend errors
+    if (requestUrl.includes("/shorten")) {
+      setError(`Unexpected backend error (${status}): ${data?.detail || "Unknown"}`);
+      return;
+    }
+
+    // Fallback
+    setError(`Unexpected error (${status}) from ${requestUrl}`);
+  };
+
 
   return (
     <div style={commonStyles.container}>

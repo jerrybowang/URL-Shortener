@@ -30,7 +30,7 @@ def init_db():
     if not existing_tables or (existing_tables == ["alembic_version"]):
         print("DB is empty, creating tables from Base.metadata...")
         # import tables
-        from . import models
+        from app.DB import models
         Base.metadata.create_all(bind=engine)
     else:
         print("DB is already initialized.")
