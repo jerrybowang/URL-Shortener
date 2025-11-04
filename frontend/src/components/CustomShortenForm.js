@@ -8,7 +8,7 @@ export default function CustomShortenForm({ getAccessToken, setShortUrl }) {
   const [alias, setAlias] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const { user, loginWithRedirect } = useAuth0();
+  const { loginWithRedirect } = useAuth0();
 
   const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:8000";
 
@@ -48,7 +48,6 @@ export default function CustomShortenForm({ getAccessToken, setShortUrl }) {
         { 
           long_url: longUrl, 
           custom_alias: alias,
-          user_name: user.sub
         },
         {
           headers: { Authorization: `Bearer ${token}` },
@@ -92,7 +91,7 @@ export default function CustomShortenForm({ getAccessToken, setShortUrl }) {
           return;
         }
       }
-      setError("Alias already taken by another user.");
+      setError("Alias already taken.");
       return;
     }
 

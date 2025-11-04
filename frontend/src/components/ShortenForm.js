@@ -1,13 +1,11 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { useAuth0 } from "@auth0/auth0-react";
 import { commonStyles } from "../styles/commonStyles";
 
-export default function ShortenForm({ getAccessToken, setShortUrl }) {
+export default function ShortenForm({ setShortUrl }) {
   const [longUrl, setLongUrl] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const { isAuthenticated, loginWithRedirect } = useAuth0();
 
   const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:8000";
 
@@ -32,16 +30,6 @@ export default function ShortenForm({ getAccessToken, setShortUrl }) {
     setLoading(true);
     try {
       let headers = { "Content-Type": "application/json" };
-      if (isAuthenticated && getAccessToken) {
-        try {
-          const token = await getAccessToken();
-          headers.Authorization = `Bearer ${token}`;
-        } catch (err) {
-          console.warn("⚠️ Could not get access token, reauthenticating...");
-          await loginWithRedirect();
-          return;
-        }
-      }
 
       const response = await axios.post(
         `${backendUrl}/shorten`,

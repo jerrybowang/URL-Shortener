@@ -29,6 +29,8 @@ REACT_APP_AUTH0_API_AUDIENCE=< your auth0 api audience >
 # used by the backend
 AUTH0_DOMAIN=< your auth0 domain >
 API_AUDIENCE=< your auth0 api audience >
+M2M_CLIENT_ID=< your machine to machine client ID >
+M2M_CLIENT_SECRET=< your machine to machine client secret >
 
 # used by the DB
 POSTGRES_USER=< user name >
