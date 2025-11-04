@@ -4,6 +4,7 @@ from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy import String, DateTime
 import datetime
 
+
 class URL(Base):
     __tablename__ = "urls"
 

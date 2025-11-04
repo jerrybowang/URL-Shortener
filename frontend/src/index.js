@@ -11,11 +11,19 @@ ReactDOM.createRoot(document.getElementById("root")).render(
     domain={domain}
     clientId={clientId}
     authorizationParams={{
-    redirect_uri: window.location.origin,
-    audience: process.env.REACT_APP_AUTH0_API_AUDIENCE
-  }}
+      redirect_uri: window.location.origin,
+      audience: process.env.REACT_APP_AUTH0_API_AUDIENCE
+    }}
     useRefreshTokens={true}
     cacheLocation="localstorage"
+    onRedirectCallback={(appState) => {
+      console.log("🔁 Redirect callback", appState);
+
+      if (appState?.linking === true) {
+        sessionStorage.setItem("auth0.linking_flag", "true");
+      }
+
+    }}
   >
     <App />
   </Auth0Provider>

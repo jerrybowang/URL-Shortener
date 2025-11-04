@@ -31,9 +31,11 @@ def init_db():
         print("DB is empty, creating tables from Base.metadata...")
         # import tables
         from app.DB import models
+
         Base.metadata.create_all(bind=engine)
     else:
         print("DB is already initialized.")
+
 
 # get db session
 def get_db():
