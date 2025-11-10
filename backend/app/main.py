@@ -101,7 +101,7 @@ def shorten(data: URLRequest, request: Request, db: Session = Depends(get_db)):
 
 
 @app.post("/shorten/custom")
-def shorten_custom(
+async def shorten_custom(
     data: URLRequest,
     overwrite: bool,
     request: Request,
@@ -110,7 +110,6 @@ def shorten_custom(
 ):
     alias = data.custom_alias
     user_id = user["sub"]
-    print(user_id)
     # case: alias not set
     if not alias:
         return shorten(data, request, db)
