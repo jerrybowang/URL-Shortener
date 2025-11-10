@@ -40,7 +40,8 @@ init_db()
 with engine.connect() as conn:
     ctx = MigrationContext.configure(conn)
     # import tables
-    from app.DB import models 
+    # use "noqa: F401" for ruff to ignore import error for this line
+    from app.DB import models # noqa: F401
     diff = compare_metadata(ctx, Base.metadata)
 
     if diff:

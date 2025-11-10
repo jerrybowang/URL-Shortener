@@ -30,7 +30,8 @@ def init_db():
     if not existing_tables or (existing_tables == ["alembic_version"]):
         print("DB is empty, creating tables from Base.metadata...")
         # import tables
-        from app.DB import models
+        # use "noqa: F401" for ruff to ignore import error for this line
+        from app.DB import models # noqa: F401
 
         Base.metadata.create_all(bind=engine)
     else:
