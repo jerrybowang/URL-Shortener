@@ -8,7 +8,8 @@ from alembic import context
 import os
 from dotenv import load_dotenv
 from app.DB.database import Base
-from app.DB import models
+# use "noqa: F401" for ruff to ignore import error for this line
+from app.DB import models # noqa: F401
 
 load_dotenv()
 
