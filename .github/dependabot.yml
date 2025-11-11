@@ -1,11 +1,11 @@
 version: 2
 updates:
-  - package-ecosystem: "pip"           
+  - package-ecosystem: "pip"
     directory: "/backend"
     schedule:
       interval: "monthly"
     open-pull-requests-limit: 5
-    commit-message: 
+    commit-message:
       prefix: "[OPS-001]"
 
   - package-ecosystem: "docker"
@@ -15,7 +15,7 @@ updates:
     schedule:
       interval: "monthly"
     open-pull-requests-limit: 5
-    commit-message: 
+    commit-message:
       prefix: "[OPS-001]"
 
   - package-ecosystem: "npm"
@@ -23,5 +23,5 @@ updates:
     schedule:
       interval: "monthly"
     open-pull-requests-limit: 5
-    commit-message: 
+    commit-message:
       prefix: "[OPS-001]"

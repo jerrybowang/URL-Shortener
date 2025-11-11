@@ -8,8 +8,9 @@ from alembic import context
 import os
 from dotenv import load_dotenv
 from app.DB.database import Base
+
 # use "noqa: F401" for ruff to ignore import error for this line
-from app.DB import models # noqa: F401
+from app.DB import models  # noqa: F401
 
 load_dotenv()
 
@@ -78,9 +79,7 @@ def run_migrations_online() -> None:
     )
 
     with connectable.connect() as connection:
-        context.configure(
-            connection=connection, target_metadata=target_metadata
-        )
+        context.configure(connection=connection, target_metadata=target_metadata)
 
         with context.begin_transaction():
             context.run_migrations()
