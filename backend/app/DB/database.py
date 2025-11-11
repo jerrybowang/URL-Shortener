@@ -31,7 +31,7 @@ def init_db():
         print("DB is empty, creating tables from Base.metadata...")
         # import tables
         # use "noqa: F401" for ruff to ignore import error for this line
-        from app.DB import models # noqa: F401
+        from app.DB import models  # noqa: F401
 
         Base.metadata.create_all(bind=engine)
     else:

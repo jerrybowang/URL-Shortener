@@ -8,7 +8,7 @@ export default function LinkAccountButton() {
 
   const linkAccount = () => {
     sessionStorage.setItem("auth0.linking_flag", "true");
-    
+
     loginWithRedirect({
       authorizationParams: {
         prompt: "login",

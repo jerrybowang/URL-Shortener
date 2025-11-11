@@ -22,28 +22,26 @@ _management_token_expire_at = datetime.min.replace(tzinfo=timezone.utc)
 _management_lock = asyncio.Lock()
 
 
-
-
 async def get_jwks() -> dict:
     global _jwks_cache, _jwks_expire_at
     now = datetime.now(timezone.utc)
     if _jwks_cache and now < _jwks_expire_at:
         return _jwks_cache
-    
+
     # case: cache miss
     async with _jwks_lock:
         # double check
         if _jwks_cache and now < _jwks_expire_at:
             return _jwks_cache
-        
+
         async with httpx.AsyncClient() as client:
             response = await client.get(JWKS_URL, timeout=10)
             response.raise_for_status()
             jwks = response.json()
-        
+
         _jwks_cache = jwks
         _jwks_expire_at = now + timedelta(hours=10)  # 10 hours
-    
+
     return jwks
 
 
@@ -54,13 +52,15 @@ async def get_management_api_token() -> str:
 
     if _management_token and now < _management_token_expire_at - timedelta(seconds=60):
         return _management_token
-    
+
     # case: cache miss
     async with _management_lock:
         # double check
-        if _management_token and now < _management_token_expire_at - timedelta(seconds=60):
+        if _management_token and now < _management_token_expire_at - timedelta(
+            seconds=60
+        ):
             return _management_token
-        
+
         payload = {
             "grant_type": "client_credentials",
             "client_id": M2M_CLIENT_ID,
@@ -81,7 +81,6 @@ async def get_management_api_token() -> str:
         _management_token_expire_at = exp
 
         return token
-
 
 
 async def link_account_helper(data: LinkRequest, token):
@@ -109,14 +108,14 @@ async def verify_token(token: HTTPAuthorizationCredentials = Depends(reusable_oa
             if key["kid"] == unverified_header.get("kid"):
                 rsa_key = key
                 break
-        
+
         if not rsa_key:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Invalid header: key ID not found",
                 headers={"WWW-Authenticate": "Bearer"},
             )
-        
+
         payload = jwt.decode(
             token.credentials,
             rsa_key,

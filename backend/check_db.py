@@ -13,12 +13,11 @@ from alembic.autogenerate import compare_metadata
 load_dotenv()
 
 
-
 DATABASE_URL = os.getenv("DATABASE_URL")
 
 if not DATABASE_URL:
     raise ValueError("DB url not found in env variable")
-    
+
 engine = create_engine(DATABASE_URL)
 
 # wait for DB to be ready
@@ -41,7 +40,8 @@ with engine.connect() as conn:
     ctx = MigrationContext.configure(conn)
     # import tables
     # use "noqa: F401" for ruff to ignore import error for this line
-    from app.DB import models # noqa: F401
+    from app.DB import models  # noqa: F401
+
     diff = compare_metadata(ctx, Base.metadata)
 
     if diff:
@@ -51,7 +51,9 @@ with engine.connect() as conn:
         from alembic import command
 
         alembic_cfg = Config("alembic.ini")
-        command.revision(alembic_cfg, message="auto sync with DB models", autogenerate=True)
+        command.revision(
+            alembic_cfg, message="auto sync with DB models", autogenerate=True
+        )
         command.upgrade(alembic_cfg, "head")
     else:
         print("No model changes detected, skipping migration.")

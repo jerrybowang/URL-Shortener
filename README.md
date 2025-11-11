@@ -1,18 +1,40 @@
 # URL-Shortener
 
-This is a **practice project** focusing primarily on **backend development**.  
+This is a **practice project** focusing primarily on **backend development**.
 The frontend is a **minimal React web app**, generated with AI, serving mainly as a testing interface.
 
 
 
 ## Overview
 
-- **Authentication:** Handled via **Auth0**.  
+- **Authentication:** Handled via **Auth0**.
 - **Authorization:** The frontend passes a **JWT** to the backend, which verifies it before processing requests.
 - **Frontend:** Simple React app to interact with the backend API.
 - **Backend:** Containerized API service for request handling.
 - **Secrets:**
  `.env` for local development, secrets management(eg. Github secrets) for CI/CD and cloud environment.
+
+
+## Pre-commit Hooks
+
+This project uses pre-commit to automatically enforce code quality before each commit.
+
+When you make a commit, pre-commit will automatically check and fix code style issues; if any files are modified, the commit will be halted so you can review and re-stage the changes.
+
+To enable this workflow, install pre-commit (preferably in a virtual environment) and set up the hooks with:
+
+
+```bash
+pip install pre-commit
+pre-commit install
+```
+
+You can also run all checks manually at any time using:
+
+```bash
+pre-commit run --all-files
+```
+
 
 ## Setup Instructions
 
@@ -39,9 +61,9 @@ POSTGRES_DB=< DB name >
 POSTGRES_HOST=< must matches the service name in docker-compose >
 POSTGRES_PORT=< port number >
 DATABASE_URL=postgresql+psycopg2://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}
-
-
 ```
+
+Add this file to your `.gitignore` to prevent credential leakage.
 
 ### 2. Start the Services
 

@@ -45,8 +45,8 @@ export default function CustomShortenForm({ getAccessToken, setShortUrl }) {
 
       const response = await axios.post(
         `${backendUrl}/shorten/custom`,
-        { 
-          long_url: longUrl, 
+        {
+          long_url: longUrl,
           custom_alias: alias,
         },
         {
